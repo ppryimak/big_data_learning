@@ -11,4 +11,4 @@ COPY ./server/target/universal/dist /app
 EXPOSE 8080
 
 # run /app/bin/play-scala-server executable in port 8080
-CMD ["/bin/bash", "/app/bin/play-scala-server", "-Dhttp.port=8080"] 
+CMD ["/bin/bash", "/app/bin/play-scala-server", "-Dhttp.port=8080", "-Dfile.encoding=UTF-8", "-Duser.dir=/app"]

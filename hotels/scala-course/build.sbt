@@ -19,8 +19,17 @@ lazy val server = project.enablePlugins(PlayScala).settings(
         "org.webjars" %% "webjars-play" % "2.6.0-M1",
         "org.webjars" % "bootstrap" % "3.3.7",
         "org.webjars" % "animate.css" % "3.5.2",
+        "com.google.guava" % "guava" % "15.0",
+        "org.apache.hadoop" % "hadoop-common" % "2.6.0",
+        "org.apache.hadoop" % "hadoop-mapred" % "0.22.0",
+        "org.apache.hbase" % "hbase-common" % "1.0.0",
+        "org.apache.hbase" % "hbase-client" % "1.0.0",
         "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0" % Test,
         "org.jsoup" % "jsoup" % "1.10.2" % Test
+    ),
+    dependencyOverrides += "com.google.guava" % "guava" % "15.0",
+    resolvers ++= Seq(
+        "Hadoop Releases" at "https://repository.cloudera.com/content/repositories/releases/"
     ),
     scalaJSProjects := Seq(client),
     pipelineStages in Assets := Seq(scalaJSPipeline),
