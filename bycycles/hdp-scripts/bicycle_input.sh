@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FOLDER=/bicyclein
+FOLDER=/bikein
 ACTION=$1
 
 if [ "$ACTION" = "create" ]; then
