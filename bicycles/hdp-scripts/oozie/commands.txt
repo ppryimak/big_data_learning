@@ -1,0 +1,8 @@
+oozie jobs -oozie http://localhost:11000/oozie -localtime -len 2 -filter status=RUNNING
+oozie job -oozie http://localhost:11000/oozie -config job.properties -run
+oozie job -oozie http://localhost:11000/oozie -log 0000143-180418215110881-oozie-oozi-W
+oozie job -oozie http://localhost:11000/oozie -info 0000143-180418215110881-oozie-oozi-W
+oozie job -oozie http://localhost:11000/oozie -kill 0000143-180418215110881-oozie-oozi-W
+tail -f /var/log/oozie/oozie-error.log
+
+

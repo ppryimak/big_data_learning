@@ -1,0 +1,33 @@
+<coordinator-app name="BIKE_IN" frequency="05" start="${start}" end="${end}" timezone="UTC" xmlns="uri:oozie:coordinator:0.1">
+   <datasets>
+      <dataset name="input1" frequency="60" initial-instance="2017-01-01T00:00Z" timezone="UTC">
+		 <uri-template>${nameNode}/bikein</uri-template>
+         <done-flag>status.csv</done-flag>
+      </dataset>
+   </datasets>
+   <input-events>
+      <data-in name="coordInput1" dataset="input1">
+          <start-instance>${coord:current(-23)}</start-instance>
+          <end-instance>${coord:current(0)}</end-instance>
+      </data-in>
+   </input-events>
+   <action>
+      <workflow>
+         <app-path>${workflowAppUri}</app-path>
+          <configuration>
+                <property>
+                    <name>jobTracker</name>
+                    <value>${jobTracker}</value>
+                </property>
+                <property>
+                    <name>nameNode</name>
+                    <value>${nameNode}</value>
+                </property>
+                <property>
+                    <name>queueName</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+      </workflow>
+   </action>
+</coordinator-app>
