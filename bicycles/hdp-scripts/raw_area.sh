@@ -1,7 +1,14 @@
 #!/bin/bash
 
-FOLDER=/rawarea
 ACTION=$1
+FOLDER=/rawarea
+
+if [ -z "$2" ]
+  then
+    echo "No argument supplied for folder using default $FOLDER"
+  else
+    FOLDER=$2
+fi
 
 if [ "$ACTION" = "create" ]; then
 	echo "Creating folder $FOLDER"
