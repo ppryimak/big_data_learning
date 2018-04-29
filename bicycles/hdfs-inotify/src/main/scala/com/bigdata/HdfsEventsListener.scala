@@ -3,6 +3,7 @@ package com.bigdata
 import java.io.{BufferedReader, InputStreamReader}
 import java.net.URI
 import java.text.SimpleDateFormat
+import java.time.{Instant, LocalDateTime, ZoneId}
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hdfs.client.HdfsAdmin
@@ -13,7 +14,8 @@ import org.apache.hadoop.hdfs.inotify.Event.EventType
 object HdfsEventsListener {
 
   def main(args: Array[String]): Unit = {
-    println("Hello from main of class")
+    val appStartDate = LocalDateTime.now();
+    println("Started Hdfs listner at" + appStartDate)
 
     var lastReadTxid = 0L
 
@@ -38,10 +40,7 @@ object HdfsEventsListener {
           case EventType.CREATE =>
             val createEvent = event.asInstanceOf[Event.CreateEvent]
             if(createEvent.getPath.startsWith("/bikein/status")) { //TODO: add support for all files
-              System.out.println("  path = " + createEvent.getPath)
-              System.out.println("  owner = " + createEvent.getOwnerName)
-              System.out.println("  ctime = " + createEvent.getCtime)
-              executeCreated(createEvent.getPath, createEvent.getCtime)
+              proccessCreatedEvent(createEvent)
             }
           case EventType.UNLINK =>
           case EventType.APPEND =>
@@ -51,11 +50,22 @@ object HdfsEventsListener {
         }
       }
     }
+
+    def proccessCreatedEvent(createEvent: Event.CreateEvent) = {
+      val createdDate =
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(createEvent.getCtime), ZoneId.systemDefault());
+      if (createdDate.isAfter(appStartDate) ) {
+
+        System.out.println("  path = " + createEvent.getPath)
+        System.out.println("  owner = " + createEvent.getOwnerName)
+        System.out.println("  ctime = " + createEvent.getCtime)
+        executeCreated(createEvent.getPath, createEvent.getCtime)
+      }
+    }
   }
 
   def executeCreated(path: String, time: Long) = {
-    val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-    val date = df.format(time.toLong)
+    val date = getDate(time)
 
     val p = new ProcessBuilder("/bin/bash","created.sh", path, date)
     val p2 = p.start()
@@ -67,4 +77,9 @@ object HdfsEventsListener {
     }
   }
 
+  private def getDate(time: Long) = {
+    val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val date = df.format(time.toLong)
+    date
+  }
 }

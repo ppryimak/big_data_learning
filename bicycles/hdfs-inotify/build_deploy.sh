@@ -1,7 +1,16 @@
 #!/bin/bash
 
+WORK_DIR=/root/work
+HDFS_DIR=/hdfs
+USER=root
+HOST=sandbox.hortonworks.com
+PORT=2222
+
 mvn package
 
-scp -P 2222 ./target/hdfs-inotify-uber.jar root@sandbox.hortonworks.com:/root/work/hdfs
+scp -P $PORT ./target/hdfs-inotify-uber.jar  $USER@$HOST:$WORK_DIR/$HDFS_DIR
 
-scp -P 2222 ./target/classes/created.sh root@sandbox.hortonworks.com:/root/work/hdfs
+scp -P $PORT ./target/classes/*.sh $USER@$HOST:$WORK_DIR/$HDFS_DIR
+
+ssh $USER@$HOST -p $PORT "chmod +x ${WORK_DIR}${HDFS_DIR}/*.sh; "
+
