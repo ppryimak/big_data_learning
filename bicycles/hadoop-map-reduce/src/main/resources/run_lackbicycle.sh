@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+WORK_DIR=/root/work
+INPUT_FILE=/bikein/status.csv
+OUTPUT_FOLDER=/mapreduce-output/status
+
+echo "Cleaning $OUTPUT_FOLDER first"
+bash $WORK_DIR/hdp-scripts/folder_hdfs.sh remove $OUTPUT_FOLDER
+
+hadoop jar hadoop-map-reduce-uber.jar com.bigdata.LackOfBicycles  $INPUT_FILE $OUTPUT_FOLDER
