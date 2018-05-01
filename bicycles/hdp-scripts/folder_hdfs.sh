@@ -1,13 +1,12 @@
 #!/bin/bash
 
 ACTION=$1
-FOLDER=/rawarea
+FOLDER=$2
 
 if [ -z "$2" ]
   then
-    echo "No argument supplied for folder using default $FOLDER"
-  else
-    FOLDER=$2
+    echo "No argument supplied for folder - exit"
+    exit
 fi
 
 if [ "$ACTION" = "create" ]; then

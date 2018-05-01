@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Now used only for scripts, but could aggregate the overall build
+#
+
 
 WORK_DIR=/root/work
 HDFS_SCRIPTS_DIR=/hdp-scripts
