@@ -1,4 +1,4 @@
-package com.bigdata.example
+package com.bigdata.jobs
 
 import org.apache.spark.{SparkConf, SparkContext}
 

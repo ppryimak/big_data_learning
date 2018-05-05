@@ -1,4 +1,4 @@
-package com.bigdata.example
+package com.bigdata.jobs
 
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{SQLContext, SparkSession}
