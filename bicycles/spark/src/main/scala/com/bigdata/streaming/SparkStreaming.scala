@@ -1,7 +1,6 @@
 package com.bigdata.streaming
 
-import java.util
-
+import com.bigdata.hbase.StatusHBaseService
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.kafka010.{KafkaUtils, _}
@@ -38,11 +37,14 @@ object SparkStreaming {
         kafkaParams)
     )
 
+
     stream.foreachRDD(r => {
       println("*** got an RDD, size = " + r.count())
       r.foreach(s => {
         println("Key is " + s.key)
         val statuses = Status.parseFromJson(s.value);
+        val hbaseService = new StatusHBaseService
+        hbaseService.put(statuses.toList)
         println(statuses)
       }
       )
