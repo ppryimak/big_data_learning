@@ -25,15 +25,9 @@ object Status {
     Bytes.toBytes(rowKeyStr);
   }
 
-  def parseFromJson(statusJson:String): Vector[Status] = {
+  def parseFromJson(statusJson:String): Status = {
     val jsonValue: JsValue = statusJson.parseJson
-    val jsonValueData = jsonValue.asJsObject.fields.get("data").get
-    val jsonValueStations = jsonValueData.asJsObject.fields.get("stations").get
-    val stationsArray: JsArray = jsonValueStations.asInstanceOf[JsArray]
-
-    val stationsStatusJson: Vector[JsValue] = stationsArray.elements;
-
-    stationsStatusJson.map(convertJsonStrToStatusObj(_));
+    convertJsonStrToStatusObj(jsonValue)
   }
 
   def convertToPut(status: Status): Put = {
@@ -51,16 +45,11 @@ object Status {
         stationId.convertTo[String],
         bikeAvailable.convertTo[Int],
         docksAvailable.convertTo[Int],
-        longToDateStr(lastReported.convertTo[Long])
+        lastReported.convertTo[String]
 
       )
       case other ⇒ deserializationError("Cannot deserialize ProductItem: invalid input. Raw input: " + other)
     }
   }
 
-  private def longToDateStr(dateLong:Long) = {
-    val df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
-    val date = new Date(dateLong * 1000)
-    df.format(date)
-  }
 }

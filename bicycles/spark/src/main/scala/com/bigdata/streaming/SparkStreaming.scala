@@ -37,18 +37,20 @@ object SparkStreaming {
         kafkaParams)
     )
 
+    val dstream = stream.glom();
 
-    stream.foreachRDD(r => {
-      println("*** got an RDD, size = " + r.count())
-      r.foreach(s => {
-        println("Key is " + s.key)
-        val statuses = Status.parseFromJson(s.value);
-        val hbaseService = new StatusHBaseService
-        hbaseService.put(statuses.toList)
-        println(statuses)
-      }
-      )
-    })
+
+
+    stream.glom().foreachRDD(r => {
+      r.foreach(arrayOfRecords => {
+      println("*** got new records, size = " + arrayOfRecords.size)
+        val statuses = arrayOfRecords.map(rec => Status.parseFromJson(rec.value)).toList
+        val hBaseService = new StatusHBaseService
+        hBaseService.put(statuses)
+        })
+      })
+
+
 
     ssc.start()
 

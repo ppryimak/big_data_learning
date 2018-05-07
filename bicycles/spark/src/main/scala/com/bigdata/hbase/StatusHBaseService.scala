@@ -40,14 +40,14 @@ class StatusHBaseService {
     val cells = result.rawCells();
     print(Bytes.toString(result.getRow) + " : ")
     for (cell <- cells) {
-      val col_name = Bytes.toString(CellUtil.cloneQualifier(cell))
-      var col_value = "";
-      if(col_name =="station_id") {
-        col_value = Bytes.toString(CellUtil.cloneValue(cell))
+      val colName = Bytes.toString(CellUtil.cloneQualifier(cell))
+      var colValue = "";
+      if(colName =="station_id" || colName =="last_updated") {
+        colValue = Bytes.toString(CellUtil.cloneValue(cell))
       } else {
-        col_value = Bytes.toInt(CellUtil.cloneValue(cell)).toString
+        colValue = Bytes.toInt(CellUtil.cloneValue(cell)).toString
       }
-      print("(%s,%s) ".format(col_name, col_value))
+      print("(%s,%s) ".format(colName, colValue))
     }
     println()
   }
@@ -74,6 +74,13 @@ class StatusHBaseService {
   def put(statuses:List[Status]) {
     val puts = statuses.map(Status.convertToPut).asJava;
     table.put(puts)
+    println("put successful")
+
+  }
+
+  def put(status:Status) {
+    val put = Status.convertToPut(status);
+    table.put(put)
     println("put successful")
 
   }
