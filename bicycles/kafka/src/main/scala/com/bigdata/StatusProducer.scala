@@ -10,10 +10,11 @@ import scala.util.Random
 object StatusProducer {
 
   val STATUS_URL = "https://gbfs.fordgobike.com/gbfs/es/station_status.json";
+  val statusTransformer = new StatusTransformer
 
   def main(args: Array[String]): Unit = {
 
-    val events = args(0).toInt //number of ievents
+    val cycles = args(0).toInt //number of ievents
     val topic = args(1) //topic
     val brokers = args(2) //"sandbox-hdp.hortonworks.com:6667"
     val pause = args(3).toLong //fake pause between evetns
@@ -28,21 +29,26 @@ object StatusProducer {
     val producer = new KafkaProducer[String, String](props)
     val startMillis = System.currentTimeMillis()
 
-    for (nEvents <- Range(0, events)) {
+    for (nEvents <- Range(0, cycles)) {
       val now = new Date().getTime().toString
       val statusJson =
         getOriginalStatusJson(STATUS_URL);
-      println("SENDING " + now);
-      val data = new ProducerRecord[String, String](topic, now, statusJson)
+      val events = statusTransformer.transform(statusJson)
+      println("SENDING " + events.size);
+      events.foreach(status=> {
+        val event = statusTransformer.toJson(status).toString
+        val data = new ProducerRecord[String, String](topic, status.stationId, event)
+        producer.send(data)
+      })
 
       //async
       //producer.send(data, (m,e) => {})
       //sync
-      producer.send(data)
+      println("SENT");
       TimeUnit.SECONDS.sleep(pause);
     }
 
-    System.out.println("sent per second: " + events * 1000 / (System.currentTimeMillis() - startMillis))
+    println("sent per second: " + cycles * 1000 / (System.currentTimeMillis() - startMillis))
     producer.close()
   }
 
