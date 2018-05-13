@@ -7,7 +7,7 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, Produce
 
 import scala.util.Random
 
-object StatusProducer {
+object StatusJsonProducer {
 
   val STATUS_URL = "https://gbfs.fordgobike.com/gbfs/es/station_status.json";
   val statusTransformer = new StatusTransformer
@@ -18,7 +18,7 @@ object StatusProducer {
     val topic = args(1) //topic
     val brokers = args(2) //"sandbox-hdp.hortonworks.com:6667"
     val pause = args(3).toLong //fake pause between evetns
-    val rnd = new Random()
+
     val props = new Properties()
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers)
     props.put(ProducerConfig.CLIENT_ID_CONFIG, "StatusProducer")
@@ -30,7 +30,6 @@ object StatusProducer {
     val startMillis = System.currentTimeMillis()
 
     for (nEvents <- Range(0, cycles)) {
-      val now = new Date().getTime().toString
       val statusJson =
         getOriginalStatusJson(STATUS_URL);
       val events = statusTransformer.transform(statusJson)
