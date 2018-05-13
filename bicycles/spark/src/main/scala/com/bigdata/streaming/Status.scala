@@ -1,15 +1,13 @@
 package com.bigdata.streaming
 
-import java.text.SimpleDateFormat
-import java.util.Date
-
+import org.apache.avro.generic.GenericRecord
 import org.apache.hadoop.hbase.client.Put
 import org.apache.hadoop.hbase.util.Bytes
 import spray.json.DefaultJsonProtocol._
-import spray.json.{JsArray, JsValue, _}
+import spray.json.{JsValue, _}
 
 
-case class Status (stationId: String, bikeAvailable:Int, docksAvailable:Int, lastReported:String);
+case class Status (stationId: String, bikeAvailable:Int, docksAvailable:Int, lastReported:Long);
 
 object Status {
 
@@ -45,7 +43,7 @@ object Status {
         stationId.convertTo[String],
         bikeAvailable.convertTo[Int],
         docksAvailable.convertTo[Int],
-        lastReported.convertTo[String]
+        lastReported.convertTo[Long]
 
       )
       case other ⇒ deserializationError("Cannot deserialize ProductItem: invalid input. Raw input: " + other)

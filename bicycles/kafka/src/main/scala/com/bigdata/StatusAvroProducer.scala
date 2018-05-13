@@ -45,6 +45,7 @@ object StatusAvroProducer {
 
     for (nEvents <- Range(0, cycles)) {
       val statusJson = getOriginalStatusJson(STATUS_URL)
+      //val statuses = statusTransformer.transform(statusJson).take(10)
       val statuses = statusTransformer.transform(statusJson)
       println("SENDING " + statuses.size + "to topic " + topic);
       statuses.foreach (status => {
@@ -55,12 +56,15 @@ object StatusAvroProducer {
         producer.send(data)
         //println(s"${ack.toString} written to partition ${ack.partition.toString}")
       })
+
+      println("SENT");
+      TimeUnit.SECONDS.sleep(pause);
     }
 
-    println("SENT");
-    TimeUnit.SECONDS.sleep(pause);
+
+
+    println("DONE");
   }
 
-  println("DONE");
 }
 

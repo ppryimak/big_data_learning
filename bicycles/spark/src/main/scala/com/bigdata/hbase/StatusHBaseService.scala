@@ -1,5 +1,7 @@
 package com.bigdata.hbase
 
+import java.nio.charset.StandardCharsets
+
 import com.bigdata.streaming.Status
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase._
@@ -10,7 +12,7 @@ import scala.collection.JavaConverters._
 
 class StatusHBaseService {
 
-  def createTable(tableName: String, columnFamily:Array[Byte]): Unit = {
+  def createTable(tableName: String, columnFamily:String): Unit = {
 
     val newTable: TableName = TableName.valueOf(tableName)
     val table: HTableDescriptor = new HTableDescriptor(newTable)
@@ -24,7 +26,7 @@ class StatusHBaseService {
     println(Status.tableName + " already exists")
   }
 
-  def removeTable(tableName: String, columnFamily:Array[Byte]): Unit = {
+  def removeTable(tableName: String, columnFamily:String): Unit = {
 
     val tableNameC: TableName = TableName.valueOf(tableName)
     val table: HTableDescriptor = new HTableDescriptor(tableNameC)
@@ -42,8 +44,10 @@ class StatusHBaseService {
     for (cell <- cells) {
       val colName = Bytes.toString(CellUtil.cloneQualifier(cell))
       var colValue = "";
-      if(colName =="station_id" || colName =="last_updated") {
+      if(colName =="station_id") {
         colValue = Bytes.toString(CellUtil.cloneValue(cell))
+      } else if(colName =="last_updated") {
+        colValue = Bytes.toLong(CellUtil.cloneValue(cell)).toString
       } else {
         colValue = Bytes.toInt(CellUtil.cloneValue(cell)).toString
       }
@@ -63,7 +67,7 @@ class StatusHBaseService {
   val CONNECTION = ConnectionFactory.createConnection(CONF)
   val ADMIN = CONNECTION.getAdmin();
 
-  createTable(Status.tableName, Status.cfDataBytes);
+  createTable(Status.tableName, new String(Status.cfDataBytes, StandardCharsets.UTF_8));
 
 
 
@@ -86,10 +90,11 @@ class StatusHBaseService {
   }
 
   def scan(): Unit = {
-    println("Scan Example:")
+    println("Start Scan:")
     var scan = table.getScanner(new Scan())
     scan.asScala.foreach(result => {
       printRow(result)
     })
+    println("End Scan:")
   }
 }
