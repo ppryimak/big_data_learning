@@ -1,0 +1,24 @@
+#external table
+CREATE EXTERNAL TABLE IF NOT EXISTS status_text(
+    station_id INT,
+    bikes_available INT,
+    docks_available INT,
+    time STRING)
+    COMMENT 'Bikes status'
+    ROW FORMAT DELIMITED
+    FIELDS TERMINATED BY ','
+    STORED AS TEXTFILE
+    LOCATION '/sample'
+    tblproperties ("skip.header.line.count"="1");
+
+$internal table
+CREATE TABLE IF NOT EXISTS status(
+    station_id INT,
+    bikes_available INT,
+    docks_available INT,
+    time STRING)
+    COMMENT 'Bikes status'
+    STORED AS ORC;
+
+
+INSERT OVERWRITE TABLE status SELECT * FROM status_text;
