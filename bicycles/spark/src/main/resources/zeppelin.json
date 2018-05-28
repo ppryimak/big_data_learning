@@ -1,0 +1,349 @@
+{
+  "paragraphs": [
+    {
+      "text": "import org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\n\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\n// So you don't need create them manually\n\n// load bank data\nval bankText = sc.textFile(\"hdfs://sandbox:8020/zeppelin/bank-full.csv\")\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\n\nval bank = bankText.map(s => s.split(\";\")).filter(s => s(0) != \"\\\"age\\\"\").map(\n    s => Bank(s(0).toInt, \n            s(1).replaceAll(\"\\\"\", \"\"),\n            s(2).replaceAll(\"\\\"\", \"\"),\n            s(3).replaceAll(\"\\\"\", \"\"),\n            s(5).replaceAll(\"\\\"\", \"\").toInt\n        )\n).toDF()\nbank.registerTempTable(\"bank\")",
+      "user": "anonymous",
+      "dateUpdated": "2018-05-10T09:09:16+0000",
+      "config": {
+        "colWidth": 12,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1525943035893_-1890517187",
+      "id": "20180510-090355_1382885051",
+      "dateCreated": "2018-05-10T09:03:55+0000",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500,
+      "focus": true,
+      "$$hashKey": "object:4790",
+      "dateFinished": "2018-05-10T09:07:44+0000",
+      "dateStarted": "2018-05-10T09:07:39+0000",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\nbankText: org.apache.spark.rdd.RDD[String] = hdfs://sandbox:8020/zeppelin/bank-full.csv MapPartitionsRDD[181] at textFile at <console>:62\ndefined class Bank\nbank: org.apache.spark.sql.DataFrame = [age: int, job: string ... 3 more fields]\nwarning: there was one deprecation warning; re-run with -deprecation for details\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%sql select age, count(1) from bank where age < 30 group by age order by age",
+      "user": "anonymous",
+      "dateUpdated": "2018-05-10T09:09:14+0000",
+      "config": {
+        "colWidth": 12,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql"
+        },
+        "editorMode": "ace/mode/sql",
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "age\tcount(1)\n18\t12\n19\t35\n20\t50\n21\t79\n22\t129\n23\t202\n24\t302\n25\t527\n26\t805\n27\t909\n28\t1038\n29\t1185\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525910943513_1749580416",
+      "id": "20180510-000903_2064037117",
+      "dateCreated": "2018-05-10T00:09:03+0000",
+      "dateStarted": "2018-05-10T09:07:50+0000",
+      "dateFinished": "2018-05-10T09:07:54+0000",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500,
+      "$$hashKey": "object:4791"
+    },
+    {
+      "text": "%sql select age, count(1) from bank where age < ${maxAge=30} group by age order by age\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-05-10T09:03:28+0000",
+      "config": {
+        "colWidth": 12,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql"
+        },
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {
+          "maxAge": "30"
+        },
+        "forms": {
+          "maxAge": {
+            "name": "maxAge",
+            "defaultValue": "30",
+            "hidden": false,
+            "$$hashKey": "object:5155"
+          }
+        }
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "age\tcount(1)\n18\t12\n19\t35\n20\t50\n21\t79\n22\t129\n23\t202\n24\t302\n25\t527\n26\t805\n27\t909\n28\t1038\n29\t1185\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525911221439_2095083284",
+      "id": "20180510-001341_704920960",
+      "dateCreated": "2018-05-10T00:13:41+0000",
+      "dateStarted": "2018-05-10T00:17:20+0000",
+      "dateFinished": "2018-05-10T00:17:22+0000",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500,
+      "$$hashKey": "object:4792"
+    },
+    {
+      "text": "%sql select age, count(1) as amount from bank where marital=\"${marital=single,single|divorced|married}\" group by age order by age",
+      "user": "anonymous",
+      "dateUpdated": "2018-05-10T09:03:46+0000",
+      "config": {
+        "colWidth": 12,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql"
+        },
+        "editorMode": "ace/mode/sql",
+        "runOnSelectionChange": true,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {
+          "marital": "single"
+        },
+        "forms": {
+          "marital": {
+            "name": "marital",
+            "defaultValue": "single",
+            "options": [
+              {
+                "value": "single",
+                "$$hashKey": "object:5246"
+              },
+              {
+                "value": "divorced",
+                "$$hashKey": "object:5247"
+              },
+              {
+                "value": "married",
+                "$$hashKey": "object:5248"
+              }
+            ],
+            "hidden": false,
+            "$$hashKey": "object:5238"
+          }
+        }
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "age\tamount\n18\t12\n19\t35\n20\t47\n21\t74\n22\t120\n23\t175\n24\t248\n25\t423\n26\t615\n27\t658\n28\t697\n29\t683\n30\t1012\n31\t1017\n32\t941\n33\t746\n34\t650\n35\t631\n36\t538\n37\t453\n38\t394\n39\t346\n40\t257\n41\t241\n42\t218\n43\t183\n44\t170\n45\t146\n46\t130\n47\t100\n48\t124\n49\t101\n50\t76\n51\t72\n52\t62\n53\t71\n54\t55\n55\t54\n56\t45\n57\t38\n58\t35\n59\t36\n60\t27\n61\t5\n63\t2\n66\t5\n67\t3\n68\t4\n69\t2\n70\t1\n71\t1\n72\t5\n73\t2\n77\t1\n83\t2\n86\t1\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525911439559_-700411924",
+      "id": "20180510-001719_940008714",
+      "dateCreated": "2018-05-10T00:17:19+0000",
+      "dateStarted": "2018-05-10T00:18:30+0000",
+      "dateFinished": "2018-05-10T00:18:33+0000",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500,
+      "$$hashKey": "object:4793"
+    },
+    {
+      "text": "var hiveReports = sqlContext.sql(\"select * from default.status123\")\nhiveReports.show()",
+      "user": "anonymous",
+      "dateUpdated": "2018-05-10T07:46:04+0000",
+      "config": {
+        "colWidth": 12,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "hiveReports: org.apache.spark.sql.DataFrame = [station_id: string, num_bikes_available: int ... 3 more fields]\n+----------+-------------------+-------------------+-------------+---------+\n|station_id|num_bikes_available|num_docks_available|last_reported|partition|\n+----------+-------------------+-------------------+-------------+---------+\n|        74|                 10|                 13|   1526196703|        0|\n|         3|                 19|                 12|   1526190966|        0|\n|         4|                 20|                 11|   1526194751|        0|\n|         5|                 30|                  3|   1526192704|        0|\n|         6|                 11|                  9|   1526192120|        0|\n|         7|                 21|                 14|   1526189542|        0|\n|         8|                  3|                 19|   1526196322|        0|\n|         9|                 13|                  5|   1526178829|        0|\n|        10|                 20|                  8|   1526191913|        0|\n|        11|                 14|                 21|   1526193286|        0|\n|        74|                 10|                 13|   1526196703|        0|\n|         3|                 19|                 12|   1526190966|        0|\n|         4|                 20|                 11|   1526194751|        0|\n|         5|                 30|                  3|   1526192704|        0|\n|         6|                 11|                  9|   1526192120|        0|\n|         7|                 21|                 14|   1526189542|        0|\n|         8|                  3|                 19|   1526196322|        0|\n|         9|                 13|                  5|   1526178829|        0|\n|        10|                 20|                  8|   1526191913|        0|\n|        11|                 14|                 21|   1526193286|        0|\n+----------+-------------------+-------------------+-------------+---------+\nonly showing top 20 rows\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525915819345_2035621751",
+      "id": "20180510-013019_1801400584",
+      "dateCreated": "2018-05-10T01:30:19+0000",
+      "dateStarted": "2018-05-10T01:34:49+0000",
+      "dateFinished": "2018-05-10T01:34:53+0000",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500,
+      "$$hashKey": "object:4794"
+    },
+    {
+      "text": "import org.apache.spark.sql.types._\r\n\r\nval schema = StructType(Array(\r\n      StructField(\"station_id\", IntegerType, false),\r\n      StructField(\"bikes_available\", IntegerType, false),\r\n      StructField(\"docks_available\", IntegerType, false),\r\n      StructField(\"time\", TimestampType, false)))\r\n\r\nval df = sqlContext.read\r\n      .format(\"csv\")\r\n      .schema(schema)\r\n      .load(\"/zeppelin/status1.csv\")\r\n\r\nval df1 = df.groupBy($\"station_id\", window($\"time\", \"2 minutes\")).agg(count(\"bikes_available\").alias(\"records_count\"),sum(\"bikes_available\").alias(\"bikes_available\"));\r\ndf1.show(100, false);\r\ndf1.registerTempTable(\"status\")\r\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-05-10T09:09:40+0000",
+      "config": {
+        "colWidth": 12,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.spark.sql.types._\nschema: org.apache.spark.sql.types.StructType = StructType(StructField(station_id,IntegerType,false), StructField(bikes_available,IntegerType,false), StructField(docks_available,IntegerType,false), StructField(time,TimestampType,false))\ndf: org.apache.spark.sql.DataFrame = [station_id: int, bikes_available: int ... 2 more fields]\ndf1: org.apache.spark.sql.DataFrame = [station_id: int, window: struct<start: timestamp, end: timestamp> ... 2 more fields]\n+----------+---------------------------------------------+-------------+---------------+\n|station_id|window                                       |records_count|bikes_available|\n+----------+---------------------------------------------+-------------+---------------+\n|6         |[2017-05-05 05:18:00.0,2017-05-05 05:20:00.0]|1            |14             |\n|3         |[2017-05-05 05:06:00.0,2017-05-05 05:08:00.0]|2            |16             |\n|2         |[2017-05-05 05:06:00.0,2017-05-05 05:08:00.0]|2            |16             |\n|7         |[2017-05-05 05:20:00.0,2017-05-05 05:22:00.0]|1            |11             |\n|5         |[2017-05-05 05:10:00.0,2017-05-05 05:12:00.0]|1            |4              |\n|5         |[2017-05-05 05:14:00.0,2017-05-05 05:16:00.0]|1            |4              |\n|1         |[2017-05-05 05:16:00.0,2017-05-05 05:18:00.0]|1            |5              |\n|6         |[2017-05-05 05:16:00.0,2017-05-05 05:18:00.0]|1            |3              |\n|4         |[2017-05-05 05:08:00.0,2017-05-05 05:10:00.0]|1            |4              |\n|6         |[2017-05-05 05:14:00.0,2017-05-05 05:16:00.0]|1            |14             |\n|5         |[2017-05-05 05:04:00.0,2017-05-05 05:06:00.0]|1            |3              |\n|1         |[2017-05-05 05:04:00.0,2017-05-05 05:06:00.0]|1            |1              |\n|2         |[2017-05-05 05:08:00.0,2017-05-05 05:10:00.0]|1            |1              |\n|7         |[2017-05-05 05:10:00.0,2017-05-05 05:12:00.0]|1            |10             |\n|2         |[2017-05-05 05:12:00.0,2017-05-05 05:14:00.0]|1            |2              |\n|4         |[2017-05-05 05:04:00.0,2017-05-05 05:06:00.0]|1            |12             |\n|7         |[2017-05-05 05:06:00.0,2017-05-05 05:08:00.0]|2            |20             |\n|3         |[2017-05-05 05:18:00.0,2017-05-05 05:20:00.0]|1            |5              |\n|7         |[2017-05-05 05:14:00.0,2017-05-05 05:16:00.0]|1            |11             |\n|2         |[2017-05-05 05:14:00.0,2017-05-05 05:16:00.0]|1            |14             |\n|4         |[2017-05-05 05:20:00.0,2017-05-05 05:22:00.0]|1            |5              |\n|3         |[2017-05-05 05:04:00.0,2017-05-05 05:06:00.0]|1            |0              |\n|6         |[2017-05-05 05:10:00.0,2017-05-05 05:12:00.0]|1            |2              |\n|3         |[2017-05-05 05:16:00.0,2017-05-05 05:18:00.0]|1            |13             |\n|1         |[2017-05-05 05:08:00.0,2017-05-05 05:10:00.0]|1            |6              |\n|1         |[2017-05-05 05:18:00.0,2017-05-05 05:20:00.0]|1            |9              |\n|2         |[2017-05-05 05:16:00.0,2017-05-05 05:18:00.0]|1            |12             |\n|5         |[2017-05-05 05:20:00.0,2017-05-05 05:22:00.0]|1            |12             |\n|2         |[2017-05-05 05:04:00.0,2017-05-05 05:06:00.0]|1            |4              |\n|4         |[2017-05-05 05:14:00.0,2017-05-05 05:16:00.0]|2            |13             |\n|2         |[2017-05-05 05:18:00.0,2017-05-05 05:20:00.0]|1            |7              |\n|3         |[2017-05-05 05:12:00.0,2017-05-05 05:14:00.0]|2            |22             |\n|5         |[2017-05-05 05:08:00.0,2017-05-05 05:10:00.0]|1            |1              |\n|6         |[2017-05-05 05:08:00.0,2017-05-05 05:10:00.0]|1            |14             |\n|6         |[2017-05-05 05:20:00.0,2017-05-05 05:22:00.0]|1            |14             |\n|7         |[2017-05-05 05:16:00.0,2017-05-05 05:18:00.0]|1            |14             |\n|3         |[2017-05-05 05:08:00.0,2017-05-05 05:10:00.0]|1            |0              |\n|5         |[2017-05-05 05:12:00.0,2017-05-05 05:14:00.0]|1            |6              |\n|1         |[2017-05-05 05:06:00.0,2017-05-05 05:08:00.0]|2            |16             |\n|5         |[2017-05-05 05:18:00.0,2017-05-05 05:20:00.0]|1            |6              |\n|4         |[2017-05-05 05:12:00.0,2017-05-05 05:14:00.0]|1            |12             |\n|5         |[2017-05-05 05:16:00.0,2017-05-05 05:18:00.0]|1            |8              |\n|4         |[2017-05-05 05:16:00.0,2017-05-05 05:18:00.0]|1            |13             |\n|3         |[2017-05-05 05:14:00.0,2017-05-05 05:16:00.0]|1            |5              |\n|4         |[2017-05-05 05:10:00.0,2017-05-05 05:12:00.0]|1            |12             |\n|1         |[2017-05-05 05:14:00.0,2017-05-05 05:16:00.0]|1            |9              |\n|1         |[2017-05-05 05:10:00.0,2017-05-05 05:12:00.0]|1            |1              |\n|7         |[2017-05-05 05:04:00.0,2017-05-05 05:06:00.0]|1            |10             |\n|4         |[2017-05-05 05:06:00.0,2017-05-05 05:08:00.0]|2            |9              |\n|6         |[2017-05-05 05:04:00.0,2017-05-05 05:06:00.0]|1            |14             |\n|6         |[2017-05-05 05:06:00.0,2017-05-05 05:08:00.0]|2            |17             |\n|5         |[2017-05-05 05:06:00.0,2017-05-05 05:08:00.0]|2            |8              |\n|7         |[2017-05-05 05:18:00.0,2017-05-05 05:20:00.0]|1            |6              |\n+----------+---------------------------------------------+-------------+---------------+\n\nwarning: there was one deprecation warning; re-run with -deprecation for details\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525916020445_-168529721",
+      "id": "20180510-013340_193461394",
+      "dateCreated": "2018-05-10T01:33:40+0000",
+      "dateStarted": "2018-05-10T08:41:20+0000",
+      "dateFinished": "2018-05-10T08:41:25+0000",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500,
+      "$$hashKey": "object:4795"
+    },
+    {
+      "text": "%sql select station_id, sum(bikes_available)/sum(records_count) bikes_rating from status group by station_id order by bikes_rating",
+      "user": "anonymous",
+      "dateUpdated": "2018-05-10T10:55:05+0000",
+      "config": {
+        "colWidth": 12,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false
+        },
+        "editorMode": "ace/mode/sql",
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "station_id\tbikes_rating\n5\t5.2\n1\t5.875\n3\t6.777777777777778\n2\t7.0\n4\t8.0\n6\t10.222222222222221\n7\t10.25\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525920318757_-224009660",
+      "id": "20180510-024518_1289693789",
+      "dateCreated": "2018-05-10T02:45:18+0000",
+      "dateStarted": "2018-05-10T10:55:05+0000",
+      "dateFinished": "2018-05-10T10:55:10+0000",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500,
+      "$$hashKey": "object:4796"
+    },
+    {
+      "text": "%sql\n",
+      "user": "anonymous",
+      "dateUpdated": "2018-05-10T09:11:40+0000",
+      "config": {
+        "colWidth": 12,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1525943500403_450150102",
+      "id": "20180510-091140_1213304545",
+      "dateCreated": "2018-05-10T09:11:40+0000",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500,
+      "focus": true,
+      "$$hashKey": "object:5802"
+    }
+  ],
+  "name": "My_test",
+  "id": "2DF1P8YAN",
+  "angularObjects": {
+    "2CHS8UYQQ:shared_process": [],
+    "2C8A4SZ9T_livy2:shared_process": [],
+    "2CK8A9MEG:shared_process": [],
+    "2C4U48MY3_spark2:shared_process": [],
+    "2CKAY1A8Y:shared_process": [],
+    "2CKEKWY8Z:shared_process": []
+  },
+  "config": {
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {}
+}
