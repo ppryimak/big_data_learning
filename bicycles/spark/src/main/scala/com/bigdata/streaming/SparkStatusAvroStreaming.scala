@@ -1,14 +1,14 @@
 package com.bigdata.streaming
 
 import com.bigdata.hbase.StatusHBaseService
+import com.bigdata.kafka.{Alert, AlertAvroProducer}
 import io.confluent.kafka.serializers.KafkaAvroDeserializer
-import org.apache.avro.Schema.Parser
+import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.kafka010.{KafkaUtils, _}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.avro.generic.{GenericData, GenericRecord, IndexedRecord}
 
 object SparkStatusAvroStreaming {
 
@@ -44,11 +44,20 @@ object SparkStatusAvroStreaming {
 
     stream.glom().foreachRDD(r => {
       r.foreach(arrayOfRecords => {
+      val alertSender = new AlertAvroProducer
+      val hBaseService = new StatusHBaseService
         println("*** got new records, size = " + arrayOfRecords.size)
         if (!arrayOfRecords.isEmpty) {
           val statuses = arrayOfRecords.map(rec => Status.parseFromJson(rec.value.asInstanceOf[GenericRecord].toString)).toList
-          val hBaseService = new StatusHBaseService
           hBaseService.put(statuses)
+          statuses.foreach(x=>{
+            if(x.bikeAvailable==3||x.bikeAvailable==2||x.bikeAvailable==1) {
+              alertSender.sendAlert(new Alert(x.stationId, "Bikes are running out!"))
+            }
+            if(x.bikeAvailable==0) {
+              alertSender.sendAlert(new Alert(x.stationId, "Bikes are missing!"))
+            }
+          })
         }
       })
     })
