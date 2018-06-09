@@ -14,13 +14,13 @@
  #check consumer group
  /usr/hdp/2.6.4.0-91/kafka/bin/kafka-consumer-groups.sh --bootstrap-server sandbox-hdp.hortonworks.com:6667 --describe --group connect-hdfs-sink
 
- #start seervice registry
+ #start schema registry
  /usr/hdp/confluent/confluent-3.1.1/bin/schema-registry-start /usr/hdp/confluent/confluent-3.1.1/etc/schema-registry/schema-registry.properties &
- #stop service registry
+ #stop schema registry
  /usr/hdp/confluent/confluent-3.1.1/bin/schema-registry-stop
 
   #start producer with schema
- /usr/hdp/confluent/confluent-3.1.1/bin/kafka-avro-console-producer --broker-list sandbox-hdp.hortonworks.com:6667 --topic test_hdfs \
+ /usr/hdp/confluent/confluent-3.1.1/bin/kafka-avro-console-producer --broker-list sandbox-hdp.hortonworks.com:6667 --topic test_hdfs1 \
 --property value.schema='{"type":"record","name":"myrecord","fields":[{"name":"f1","type":"string"}]}'
 
 {"f1": "value1"}
@@ -28,7 +28,13 @@
 {"f1": "value3"}
 
  #console avro consumer
- /usr/hdp/confluent/confluent-3.1.1/bin/kafka-avro-console-consumer --bootstrap-server sandbox-hdp.hortonworks.com:6667 --topic test_hdfs
+ /usr/hdp/confluent/confluent-3.1.1/bin/kafka-avro-console-consumer \
+        --topic test_hdfs \
+        --bootstrap-server sandbox-hdp.hortonworks.com:6667 \
+        --from-beginning
+
+#kafka rest start
+/usr/hdp/confluent/confluent-3.1.1/bin/kafka-rest-start /usr/hdp/confluent/confluent-3.1.1/etc/kafka-rest/kafka-rest.properties
 
  #start sink simple
  /usr/hdp/confluent/confluent-3.1.1/bin/connect-standalone /usr/hdp/confluent/confluent-3.1.1/etc/schema-registry/connect-avro-standalone.properties \

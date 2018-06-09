@@ -7,6 +7,7 @@ import com.bigdata.StatusJsonProducer.{STATUS_URL, getOriginalStatusJson, status
 import org.apache.avro.Schema.Parser
 import org.apache.avro.generic.GenericData
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+import org.apache.kafka.common.serialization.StringSerializer
 
 object StatusAvroProducer {
 
@@ -33,7 +34,10 @@ object StatusAvroProducer {
     props.put("schema.registry.url", "http://sandbox-hdp.hortonworks.com:8081")
     props.put(ProducerConfig.CLIENT_ID_CONFIG, "StatusAvroProducer")
     props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "10000")
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer")
+    //props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer")
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, classOf[StringSerializer])
+
+
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer")
     // props.put("acks", "1")
 
@@ -46,8 +50,8 @@ object StatusAvroProducer {
     for (nEvents <- Range(0, cycles)) {
       val statusJson = getOriginalStatusJson(STATUS_URL)
       //val statuses = statusTransformer.transform(statusJson).take(10)
-      val statuses = statusTransformer.transform(statusJson)
-      println("SENDING " + statuses.size + "to topic " + topic);
+      val statuses = statusTransformer.transform(statusJson).take(10)
+      println("SENDING " + statuses.size + " to topic " + topic);
       statuses.foreach (status => {
         val avroRecord = statusTransformer.toAvro(status, schema)
         println(avroRecord)
