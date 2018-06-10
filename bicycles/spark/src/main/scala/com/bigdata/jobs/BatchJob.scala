@@ -14,7 +14,7 @@ object BatchJob {
     val spark = SparkSession.builder()
       .master("local[*]")
       .enableHiveSupport()
-      .appName("CSVtoParquet").getOrCreate();
+      .appName("BatchJob").getOrCreate();
     import spark.implicits._
 
     val sqlContext = spark.sqlContext;
@@ -35,6 +35,7 @@ object BatchJob {
     last3.foreach(println);
 
     new RatingsAvroProducer().sendRating(top3, last3)
+    spark.stop()
     println("END " + BatchJob.getClass)
   }
 
