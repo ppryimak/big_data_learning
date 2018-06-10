@@ -27,7 +27,7 @@ class AlertAvroProducer {
     val props = new Properties()
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "sandbox-hdp.hortonworks.com:6667")
     props.put("schema.registry.url", "http://sandbox-hdp.hortonworks.com:8081")
-    props.put(ProducerConfig.CLIENT_ID_CONFIG, "StatusAvroProducer")
+    props.put(ProducerConfig.CLIENT_ID_CONFIG, "AlertAvroProducer")
     props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "10000")
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, classOf[StringSerializer])
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer")
