@@ -34,7 +34,9 @@ object BatchJob {
     val last3:Array[Rate] = last3rows.map(x=>new Rate(x.getAs("station_id"), x.getAs("bikes_rating")))
     last3.foreach(println);
 
-    new RatingsAvroProducer().sendRating(top3, last3)
+    val countAll=hiveReports.count();
+
+    new RatingsAvroProducer().sendRating(top3, last3, countAll)
     spark.stop()
     println("END " + BatchJob.getClass)
   }
