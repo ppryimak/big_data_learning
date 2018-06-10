@@ -19,7 +19,7 @@ object Status {
   final val colLstUpdBytes = Bytes.toBytes("last_updated")
 
   private def getRowKeyBytes(status:Status): Array[Byte] = {
-    val rowKeyStr = status.stationId + "_" + status.lastReported;
+    val rowKeyStr = status.stationId + "_" + System.currentTimeMillis;
     Bytes.toBytes(rowKeyStr);
   }
 
