@@ -4,6 +4,7 @@ import java.util.Properties
 import java.util.concurrent.TimeUnit
 
 import com.bigdata.StatusJsonProducer.{STATUS_URL, getOriginalStatusJson, statusTransformer}
+import org.apache.avro.Schema
 import org.apache.avro.Schema.Parser
 import org.apache.avro.generic.GenericData
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
@@ -52,14 +53,8 @@ object StatusAvroProducerForBatch {
       //val statuses = statusTransformer.transform(statusJson).take(10)
       val statuses = statusTransformer.transform(statusJson).take(10)
       println("SENDING " + statuses.size + " to topic " + topic);
-      statuses.foreach (status => {
-        val avroRecord = statusTransformer.toAvro(status, schema)
-        println(avroRecord)
-        //val key = "{\"station_id\":\"" + status.stationId + "\"}"
-        val data = new ProducerRecord[String, GenericData.Record](topic, status.stationId, avroRecord)
-        producer.send(data)
-        //println(s"${ack.toString} written to partition ${ack.partition.toString}")
-      })
+      sendStatuses(topic, schema, statuses, producer)
+      //sendFakeStatus(topic, producer, schema)
 
       println("SENT");
       TimeUnit.SECONDS.sleep(pause);
@@ -70,5 +65,23 @@ object StatusAvroProducerForBatch {
     println("DONE");
   }
 
+  private def sendStatuses(topic: String, schema: Schema, statuses: Vector[Status], producer: KafkaProducer[String, GenericData.Record]) = {
+    statuses.foreach(status => {
+      val avroRecord = statusTransformer.toAvro(status, schema)
+      println(avroRecord)
+      //val key = "{\"station_id\":\"" + status.stationId + "\"}"
+      val data = new ProducerRecord[String, GenericData.Record](topic, status.stationId, avroRecord)
+      producer.send(data)
+      //println(s"${ack.toString} written to partition ${ack.partition.toString}")
+    })
+  }
+
+  private def sendFakeStatus(topic: String, producer: KafkaProducer[String, GenericData.Record], schema: Schema) = {
+    val fakeStatus = new Status("XX", 1, 1, 1);
+    val avroRecord = statusTransformer.toAvro(fakeStatus, schema)
+    println(avroRecord)
+    val data = new ProducerRecord[String, GenericData.Record](topic, fakeStatus.stationId, avroRecord)
+    producer.send(data)
+  }
 }
 
