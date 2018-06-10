@@ -23,20 +23,7 @@ class AlertAvroProducer {
                             "type": "record"
                         }"""
 
-  val producer = {
-    val props = new Properties()
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "sandbox-hdp.hortonworks.com:6667")
-    props.put("schema.registry.url", "http://sandbox-hdp.hortonworks.com:8081")
-    props.put(ProducerConfig.CLIENT_ID_CONFIG, "AlertAvroProducer")
-    props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "10000")
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, classOf[StringSerializer])
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer")
-    // props.put("acks", "1")
-
-    new KafkaProducer[String, GenericData.Record](props)
-  }
-
-  def sendAlert(alert:Alert): Unit = {
+ def sendAlert(alert:Alert): Unit = {
     val parser = new Parser
     val schema = parser.parse(ALERT_SCHEMA)
 
@@ -44,7 +31,7 @@ class AlertAvroProducer {
     println("Sending alert")
     println(avroRecord)
     val data = new ProducerRecord[String, GenericData.Record](topic, alert.stationId, avroRecord)
-    producer.send(data)
+    AlertAvroProducer.PRODUCER.send(data)
     println("Alert sent")
   }
 
@@ -57,3 +44,18 @@ class AlertAvroProducer {
   }
 }
 
+
+object AlertAvroProducer {
+  val PRODUCER = {
+    val props = new Properties()
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "sandbox-hdp.hortonworks.com:6667")
+    props.put("schema.registry.url", "http://sandbox-hdp.hortonworks.com:8081")
+    props.put(ProducerConfig.CLIENT_ID_CONFIG, "AlertAvroProducer")
+    props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "10000")
+    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, classOf[StringSerializer])
+    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroSerializer")
+    // props.put("acks", "1")
+
+    new KafkaProducer[String, GenericData.Record](props)
+  }
+}
