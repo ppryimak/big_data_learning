@@ -10,7 +10,7 @@ import org.apache.avro.generic.GenericData
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.serialization.StringSerializer
 
-object StatusAvroProducerForBatch {
+object StatusAvroProducer {
 
   val STATUS_SCHEMA =
     """{

@@ -19,12 +19,15 @@ object BatchJob {
 
     val sqlContext = spark.sqlContext;
 
-    val hiveReports = sqlContext.sql("select station_id, num_bikes_available as bikes_available, from_unixtime(last_reported, 'yyyy-MM-dd hh:mm:ss') as last_reported from default.batch123")
+    val hiveReports = sqlContext.sql("select station_id, num_bikes_available as bikes_available, from_unixtime(last_reported, 'yyyy-MM-dd hh:mm:ss') as last_reported from default.station_status")
     hiveReports.show();
+
     val df = hiveReports.groupBy($"station_id", window($"last_reported", "2 minutes")).agg(count("bikes_available").alias("records_count"),sum("bikes_available").alias("bikes_available"));
     df.show(100, false);
     df.createOrReplaceTempView("status")
+
     val res = sqlContext.sql("select station_id, sum(bikes_available)/sum(records_count) bikes_rating from status group by station_id order by bikes_rating");
+    res.show(100, false);
 
     val top3rows:Array[Row] = res.head(3)
     val top3:Array[Rate] = top3rows.map(x=>new Rate(x.getAs("station_id"), x.getAs("bikes_rating")))

@@ -25,7 +25,8 @@ object SparkStatusAvroStreaming {
 
     val kafkaParams = Map[String, Object](
       ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG -> brokers, //"localhost:9092,anotherhost:9092"
-      ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
+      //ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG -> classOf[StringDeserializer],
+      ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG -> classOf[KafkaAvroDeserializer],
       ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG -> classOf[KafkaAvroDeserializer],
       ConsumerConfig.GROUP_ID_CONFIG -> "spark_status_streaming_group_id",
       ConsumerConfig.AUTO_OFFSET_RESET_CONFIG -> "latest",

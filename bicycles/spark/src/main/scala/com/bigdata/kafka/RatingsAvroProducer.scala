@@ -10,7 +10,7 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, Produce
 
 class RatingsAvroProducer {
 
-  val topic = "rating1"
+  val topic = "station_rating"
   val RATING_SCHEMA =
     """{
                             "fields": [
