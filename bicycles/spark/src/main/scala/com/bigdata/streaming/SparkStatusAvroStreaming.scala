@@ -45,21 +45,29 @@ object SparkStatusAvroStreaming {
 
     stream.glom().foreachRDD(r => {
       r.foreach(arrayOfRecords => {
-      val alertSender = new AlertAvroProducer
-      val hBaseService = new StatusHBaseService
         println("*** got new records, size = " + arrayOfRecords.size)
         if (!arrayOfRecords.isEmpty) {
-          val statuses = arrayOfRecords.map(rec => Status.parseFromJson(rec.value.asInstanceOf[GenericRecord].toString)).toList
-          hBaseService.put(statuses)
-          statuses.foreach(x=>{
-            if(x.bikeAvailable==3||x.bikeAvailable==2||x.bikeAvailable==1) {
-              alertSender.sendAlert(new Alert(x.stationId, "Bikes are running out!"))
-            }
-            if(x.bikeAvailable==0) {
-              alertSender.sendAlert(new Alert(x.stationId, "Bikes are missing!"))
-            }
-          })
+          val alertSender = new AlertAvroProducer
+          val hBaseService = new StatusHBaseService
+          try {
+
+            val statuses = arrayOfRecords.map(rec => Status.parseFromJson(rec.value.asInstanceOf[GenericRecord].toString)).toList
+            hBaseService.put(statuses)
+            statuses.foreach(x => {
+              if (x.bikeAvailable == 3 || x.bikeAvailable == 2 || x.bikeAvailable == 1) {
+                alertSender.sendAlert(new Alert(x.stationId, "Bikes are running out!"))
+              }
+              if (x.bikeAvailable == 0) {
+                alertSender.sendAlert(new Alert(x.stationId, "Bikes are missing!"))
+              }
+            })
+          } catch {
+            case e: Throwable => {e.printStackTrace; throw e;}
+          } finally {
+            hBaseService.close()
+          }
         }
+        println("*** ENDED PROCESSING ")
       })
     })
 

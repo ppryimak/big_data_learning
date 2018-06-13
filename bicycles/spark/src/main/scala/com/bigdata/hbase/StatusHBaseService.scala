@@ -67,7 +67,7 @@ class StatusHBaseService {
   val CONNECTION = ConnectionFactory.createConnection(CONF)
   val ADMIN = CONNECTION.getAdmin();
 
-  createTable(Status.tableName, new String(Status.cfDataBytes, StandardCharsets.UTF_8));
+  //createTable(Status.tableName, new String(Status.cfDataBytes, StandardCharsets.UTF_8));
 
 
 
@@ -96,5 +96,10 @@ class StatusHBaseService {
       printRow(result)
     })
     println("End Scan:")
+  }
+
+  def close(): Unit = {
+    ADMIN.close()
+    CONNECTION.close()
   }
 }
